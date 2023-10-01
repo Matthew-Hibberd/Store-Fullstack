@@ -1,37 +1,45 @@
 import React, { useState } from 'react';
 import { useUser } from '../UserContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  ChakraProvider,
+  theme,
+  Input,
+  Button,
+  Text
+} from '@chakra-ui/react';
 
-function Login() {
+
+const Login: React.FC =() => {
   const { user, loginUser } = useUser();
   const [email, setEmail] = useState('');
-  const [loggedIn, setLoggedIn] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     await loginUser(email);
-    setLoggedIn(true);
+    navigate('/')
   };
 
-  return (
-    <div>
-      {!loggedIn ? (
-        <>
-          <h2>Login</h2>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <button onClick={handleLogin}>Login</button>
-          <p>
+  return (<div>
+      <ChakraProvider theme={theme}>
+      {!user ? (
+          <><Input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)} /><Button onClick={handleLogin}>Login</Button>
+          <Text>
             Don't have an account?{' '}
             <Link to="/register">Register</Link>
-          </p>
-        </>
+          </Text></>
       ) : (
-        <p>Logged In</p>
+        <div>
+          <>
+          <Text>Logged In</Text>
+          </>
+        </div>
       )}
+    </ChakraProvider>
     </div>
   );
 }

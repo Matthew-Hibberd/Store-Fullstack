@@ -1,0 +1,13 @@
+# Ignore Django-specific temporary files and directories
+backend/legoapi/__pycache__
+backend/*.pyc
+backend/*.pyo
+backend/local_settings.py
+backend/legoapi/db.sqlite3
+backend/.venv
+backend/legoapi/shop/__pycache__
+
+# Ignore React-specific build and temporary files
+frontend/my-app//node_modules/
+frontend/my-app/build/
+frontend/my-app/.env

@@ -1,26 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import products from '../data/products';
 
 import Cart from './Cart';
 import OrdersList from './OrdersList'
 
 import {
     Heading,
-    ChakraProvider,
-    Box,
-    VStack,
-    Grid,
-    theme,
-    List,
-    ListItem,
     Tabs,
     TabList,
     TabPanels,
     Tab,
     TabPanel,
+    Button,
+    Text
   } from "@chakra-ui/react"
+  import PaginatedProductList from './PaginatedProductList';
 import Login from './Login';
+import { useUser } from '../UserContext';
+import { useNavigate } from 'react-router-dom';
 
   interface Product{
     name: string,
@@ -30,8 +26,14 @@ import Login from './Login';
 }
 
 const ProductList: React.FC = () => {
-
+    const { user, logout } = useUser();
     const [products, setProducts] = useState<Product[]>([]);
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout()
+        navigate('/')
+    }
 
     useEffect(() => {
         async function fetchData() {
@@ -58,24 +60,54 @@ const ProductList: React.FC = () => {
         }
         fetchData()
     }, []);
+    const handleDelete = (selectedProductUuids: string[]) => {
+        async function deleteProducts() {
+        // Fetch product data from the API
+        fetch('http://127.0.0.1:5000/remove-products/', {
+            method: 'POST',
+            body: JSON.stringify({"ids":selectedProductUuids}),
+            headers: {
+            'Content-Type': 'application/json',
+            },
+        })
+        .then((response) => {
+            console.log(response.status)
+            if (response.status === 200) {
+                const updatedProducts = products.filter(
+                    (product) => !selectedProductUuids.includes(product.uuid)
+                );
+                setProducts(updatedProducts);
+            } else {
+                console.error('Invalid API response:',response.status);
+            }
+            })
+        .catch((error) => {
+        console.error('Error delete product:', error);
+        });
+        }
+        deleteProducts()
+      };
   return (
     <Tabs>
         <TabList>
             <Tab>Shop</Tab>
             <Tab>Cart</Tab>
             <Tab>Orders</Tab>
-            <Tab>Login</Tab>
+            {!user ? (
+                <Tab>Login</Tab>
+            ) : (
+                <Button onClick={handleLogout}>Logout</Button>
+            )
+            }
         </TabList>
         <TabPanels>
             <TabPanel>
             <Heading>Shop</Heading>
-            <List spacing={3}>
-                {products.map((product) => (
-                    <ListItem key={product.uuid}>
-                        <Link to={`/product/${product.uuid}`}>{product.name}</Link>
-                    </ListItem>
-                ))}
-            </List>
+            {products ? (
+                <PaginatedProductList data={products} onDelete={handleDelete}/>
+            ) : (
+                <Text>There are no more products available. Get the Shop Admin to add some to the database!</Text>
+            )}
             </TabPanel>
             <TabPanel>
             <Heading>Cart</Heading>

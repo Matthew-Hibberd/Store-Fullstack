@@ -1,3 +1,4 @@
+from django.forms import ValidationError
 from rest_framework import serializers
 from .models import CustomerUser, Product, Order
 
@@ -40,6 +41,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class UpdateProductSerializer(serializers.ModelSerializer):
     price = serializers.FloatField(required=False)
+    name = serializers.CharField(required=False)
+    description = serializers.CharField(required=False)
     class Meta:
         model = Product
         fields = ['name', 'description', 'price', 'uuid']
@@ -68,6 +71,8 @@ class CreateOrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = '__all__'
     def validate(self, attrs):
+        if not 'customer_id' in self.initial_data.keys():
+            raise ValidationError("customer_id is a required field")
         attrs["CustomerUser_id"] = CustomerUser.objects.filter(uuid=self.initial_data['customer_id']).first()
         for product in self.initial_data['products']:
             try:

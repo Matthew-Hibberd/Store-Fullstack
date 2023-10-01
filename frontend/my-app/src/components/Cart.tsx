@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCart } from '../CartContext';
-import products from '../data/products'; // Import your product data or fetch it from an API
+// import products from '../data/products'; // Import your product data or fetch it from an API
 import {
     ChakraProvider,
     theme,
@@ -19,8 +19,7 @@ const Cart: React.FC = () => {
     const { user } = useUser();
 
   // Calculate the cart total price based on the products and their quantities
-  const cartTotal = cart.reduce((total, productId) => {
-    const product = products.find((p) => p.id === productId);
+  const cartTotal = cart.reduce((total, product) => {
     if (product) {
       return total + product.price;
     }
@@ -37,10 +36,11 @@ const Cart: React.FC = () => {
 
     try {
       // Assuming you have an API endpoint for order submission
-      const uuid = user
+      const uuid = user?.uuid
+
       const response = await fetch('http://127.0.0.1:5000/order', {
         method: 'POST',
-        body: JSON.stringify({"products": cart, "total": cartTotal, "customer_id": uuid, "paid": false}),
+        body: JSON.stringify({"products": cart.map((product) => product.uuid), "total": cartTotal, "customer_id": uuid, "paid": false}),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -63,23 +63,18 @@ const Cart: React.FC = () => {
   return (
     <div>
       {user ? (
-        <p>Welcome, {user}!</p>
-      ) : (
-        <p>Please log in to view your orders.</p>
-      )}
-      {
-    <ChakraProvider theme={theme}>
+        <ChakraProvider theme={theme}>
+        <Text>Welcome, {user.name}!</Text>
       {cart.length === 0 ? (
         <Text>Your cart is empty.</Text>
       ) : (
         <div>
             <List spacing={3}>
-                {cart.map((productId) => {
-                    const product = products.find((p) => p.id === productId);
+                {cart.map((product) => {
                     if (product) {
                         return (
-                            <ListItem key={product.id}>
-                            <Link to={`/product/${product.id}`}>{product.name}</Link>
+                            <ListItem key={product.uuid}>
+                            <Link to={`/product/${product.uuid}`}>{product.name}</Link>
                         </ListItem>
                         );
                     }
@@ -91,7 +86,11 @@ const Cart: React.FC = () => {
         </div>
       )}
     </ChakraProvider>
-    }
+      ) : (
+        <ChakraProvider theme={theme}>
+          <Text>Please log in to view your cart.</Text>
+        </ChakraProvider>
+      )}
     </div>
   );
 };

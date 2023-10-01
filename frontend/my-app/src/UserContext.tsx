@@ -1,9 +1,22 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
-const UserContext = createContext<{ user: string | null; registerUser: (name: string, email: string) => void; loginUser: (email: string) => void } | undefined>(undefined);
+interface UserContextType {
+  user: User | null;
+  loginUser: (email: string) => void;
+  registerUser: (name: string, email:string) => void;
+  logout: () => void;
+}
+
+export interface User {
+  email: string,
+  uuid: string,
+  name: string
+}
+
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   const registerUser = async (name: string, email:string) => {
     try {
@@ -40,13 +53,18 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (response.ok) {
         const data = await response.json();
         console.log("Log in data",data)
-        setUser(data.uuid);
+        setUser(data.customers[0]);
       }
     } catch (error) {
       console.error('Error logging in user:', error);
     }
-  };return (
-    <UserContext.Provider value={{ user, registerUser, loginUser }}>
+  };
+  const logout = () => {
+    // Logic to log out the user and set the user state to null
+    setUser(null);
+  };
+  return (
+    <UserContext.Provider value={{ user, registerUser, loginUser, logout }}>
       {children}
     </UserContext.Provider>
   );

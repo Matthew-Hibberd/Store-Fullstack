@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { useUser } from '../UserContext';
 import { useNavigate } from 'react-router-dom';
+import {
+  ChakraProvider,
+  theme,
+  Input,
+  Button,
+  Text,
+  Heading
+} from '@chakra-ui/react';
 
 function Register() {
   const { registerUser } = useUser();
@@ -27,33 +35,33 @@ function Register() {
   };
 
   return (
-    <div>
+    <ChakraProvider theme={theme}>
       {registrationSuccess ? (
-        <p>Registration Successful. You are now logged in!</p>
+        <Text>Registration Successful. You are now logged in!</Text>
       ) : (
         <>
-          <h2>Register</h2>
+          <Heading>Register</Heading>
           {registrationError && (
-            <p style={{ color: 'red' }}>Registration failed. Please try again.</p>
+            <Text style={{ color: 'red' }}>Registration failed. Please try again.</Text>
           )}
-          <input
+          <Input
             type="text"
             placeholder="Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          <input
+          <Input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <button onClick={handleRegister}>Register</button>
+          <Button onClick={handleRegister}>Register</Button>
         </>
       )}
 
-      <button onClick={() => navigate('/')}>Back to Shop</button>
-    </div>
+      <Button onClick={() => navigate('/')}>Back to Shop</Button>
+    </ChakraProvider>
   );
 }
 

@@ -1,17 +1,18 @@
 import React, { useState } from "react"
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import ProductList from './components/ProductList'
-import ProductDetail from './components/ProductDetail'
+import ProductDetail, { Product } from './components/ProductDetail'
 import {
   ChakraProvider,
   theme,
 } from "@chakra-ui/react"
-import { UserProvider } from './UserContext';
+import { User, UserProvider } from './UserContext';
 import Register from './components/Register';
 import CartProvider from "./CartContext"
 
 const App: React.FC = () => {
-  const [cart, setCart] = useState<string[]>([]);
+  const [cart, setCart] = useState<Product[]>([]);
+  const [user, setUser] = useState<User| null>(null)
   return (
     <ChakraProvider theme={theme}>
       <UserProvider>

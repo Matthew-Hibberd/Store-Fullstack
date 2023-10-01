@@ -1,15 +1,16 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { Product } from './components/ProductDetail'
 
 // Define the CartContextType as before
 interface CartContextType {
-  cart: string[];
-  addToCart: (productId: string) => void;
+  cart: Product[];
+  addToCart: (product: Product) => void;
   clearCart: () => void;
 }
 
 const defaultCartContext: CartContextType = {
   cart: [],
-  addToCart: () => {},
+  addToCart: (product: Product) => {},
   clearCart: () => {}
 };
 
@@ -29,10 +30,10 @@ export const useCart = () => {
 };
 
 const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
-  const [cart, setCart] = useState<string[]>([]);
+  const [cart, setCart] = useState<Product[]>([]);
 
-  const addToCart = (productId: string) => {
-    setCart((prevCart) => [...prevCart, productId]);
+  const addToCart = (product: Product) => {
+    setCart((prevCart) => [...prevCart, product]);
   };
   const clearCart = () => {
     setCart([]);
